@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0c1640">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MileMate">
+<title>MileMate</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c1330; --ink2:#39415f; --muted:#727a93; --line:#e2e5f0;
+    --bg:#eef1fc; --card:#ffffff;
+    --cobalt:#2a4bff; --cobalt-d:#1c34d6;
+    --lime:#b6f500; --lime-soft:#d6ff5e;
+    /* legacy aliases mapped to the new palette */
+    --amber:#b6f500; --amber-d:#2a4bff;
+    --road:#0c1640;
+    --good:#0a8f5b; --good-bg:#e3fbef; --warn:#b4540a; --warn-bg:#fdf0e3;
+    --danger:#e0294e; --shadow:0 1px 2px rgba(12,22,64,.05),0 12px 30px rgba(42,75,255,.10);
+    --radius:18px; --tap:54px;
+    --display:'Bricolage Grotesque',Georgia,serif;
+    --body:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--body); color:var(--ink); background:var(--bg);
+    background-image:radial-gradient(circle at 8% -8%,rgba(42,75,255,.16),transparent 42%),
+                     radial-gradient(circle at 100% 2%,rgba(182,245,0,.20),transparent 38%),
+                     radial-gradient(circle at 50% 120%,rgba(42,75,255,.10),transparent 45%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased; line-height:1.45;
+    padding-bottom:calc(86px + env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px}
+  h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.02em;margin:0}
+  /* Header */
+  header{
+    position:sticky;top:0;z-index:40;color:#fff;
+    background:linear-gradient(120deg,#11225e,#0c1640);
+    padding:calc(env(safe-area-inset-top) + 14px) 0 14px;
+    box-shadow:0 2px 18px rgba(12,22,64,.28);
+  }
+  header .wrap{display:flex;align-items:center;gap:12px}
+  .badge{width:42px;height:42px;border-radius:13px;background:var(--lime);
+    display:grid;place-items:center;font-family:var(--display);font-weight:800;
+    color:var(--road);font-size:18px;box-shadow:0 0 0 3px rgba(182,245,0,.25),inset 0 -2px 0 rgba(0,0,0,.12)}
+  header h1{font-size:21px;color:#fff;line-height:1}
+  header .sub{font-size:12.5px;color:#9fb0ff;margin-top:2px;font-weight:500}
+  header .who{margin-left:auto;text-align:right;font-size:12px;color:#9fb0ff}
+  header .who b{display:block;color:#fff;font-size:14px;font-weight:700}
+  /* Cards */
+  main{padding-top:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+  .card h2{font-size:17px;margin-bottom:4px}
+  .card .lead{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  .eyebrow{font-family:var(--body);text-transform:uppercase;letter-spacing:.09em;
+    font-size:11px;font-weight:700;color:var(--cobalt)}
+  /* Current period hero */
+  .hero{background:linear-gradient(150deg,#3357ff 0%,#2540e6 48%,#0e1c66 100%);color:#fff;border:none;
+    box-shadow:0 14px 34px rgba(42,75,255,.34)}
+  .hero .eyebrow{color:var(--lime)}
+  .hero h2{color:#fff;font-size:15px;font-weight:700;font-family:var(--body);margin-top:2px}
+  .hero .range{font-family:var(--display);font-size:23px;font-weight:800;margin:6px 0 2px}
+  .hero .payday{font-size:13px;color:#c5ceff}
+  .hero .payday b{color:var(--lime)}
+  .due{display:flex;align-items:baseline;gap:8px;margin-top:16px;
+    padding-top:16px;border-top:1px solid rgba(255,255,255,.16)}
+  .due .amt{font-family:var(--display);font-size:38px;font-weight:800;line-height:1;color:var(--lime)}
+  .due .lbl{font-size:12.5px;color:#c5ceff}
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    border-radius:999px;padding:7px 12px;font-size:12.5px;color:#dfe4ea}
+  .pill b{color:#fff}
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    min-height:var(--tap);padding:0 20px;border-radius:14px;border:none;cursor:pointer;
+    font-family:var(--body);font-weight:700;font-size:15.5px;width:100%;
+    transition:transform .08s ease,filter .15s ease}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--lime);color:var(--road);
+    box-shadow:0 5px 16px rgba(182,245,0,.38),inset 0 -2px 0 rgba(0,0,0,.10)}
+  .btn-primary:active{filter:brightness(.97)}
+  .btn-dark{background:var(--road);color:#fff}
+  .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn-sm{min-height:42px;font-size:13.5px;padding:0 14px;width:auto;border-radius:11px}
+  .btn-row{display:flex;gap:10px}
+  .btn-row .btn{width:100%}
+  /* Assistant */
+  .asst{background:linear-gradient(135deg,#fff7ea,#fff);border:1.5px solid #f6e2bd}
+  .asst .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .asst .dot{width:34px;height:34px;border-radius:50%;background:var(--amber);
+    display:grid;place-items:center;font-size:18px;flex:none}
+  .asst .top b{font-family:var(--display);font-size:15px}
+  .asst .top span{font-size:11.5px;color:var(--muted);display:block}
+  .asst-msg{background:#fff;border:1px solid #f0e4cb;border-radius:12px;padding:11px 13px;
+    font-size:14px;color:var(--ink2);margin-bottom:12px;min-height:20px}
+  .asst-msg b{color:var(--ink)}
+  textarea,input,select{font-family:var(--body)}
+  .nl-input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px;
+    font-size:15px;resize:none;min-height:52px;color:var(--ink)}
+  .nl-input:focus{outline:none;border-color:var(--cobalt)}
+  /* Big call-to-action on home */
+  .big-cta{height:74px;justify-content:flex-start;gap:14px;padding:0 18px;margin-bottom:16px;
+    box-shadow:0 8px 24px rgba(182,245,0,.50),inset 0 -2px 0 rgba(0,0,0,.10)}
+  .big-cta .cta-ico{font-size:30px;line-height:1;font-weight:400}
+  .big-cta .cta-tx{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+  .big-cta .cta-tx b{font-family:var(--display);font-size:18px;font-weight:800}
+  .big-cta .cta-tx span{font-size:12.5px;font-weight:600;color:rgba(12,22,64,.62)}
+  .link-btn{background:none;border:none;color:var(--cobalt);font-family:var(--body);
+    font-weight:700;font-size:13.5px;cursor:pointer;padding:6px 2px}
+  /* Field labels in the new flow */
+  .lbl-sm{display:block;font-family:var(--display);font-weight:800;font-size:15px;
+    margin:18px 0 9px;color:var(--ink)}
+  .lbl-sm.first{margin-top:4px}
+  .lbl-sm .hint{font-family:var(--body);font-weight:500}
+  /* Chips */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+  .chip{flex:1;min-width:64px;min-height:48px;border:1.5px solid var(--line);background:#fff;
+    border-radius:13px;font-family:var(--body);font-weight:700;font-size:15px;color:var(--ink2);
+    cursor:pointer;transition:all .12s ease}
+  .chip:active{transform:scale(.97)}
+  .chip.active{background:var(--cobalt);color:#fff;border-color:var(--cobalt);
+    box-shadow:0 4px 12px rgba(42,75,255,.32)}
+  .small-chips{margin-top:10px}
+  .small-chips .chip{min-height:42px;font-size:14px;flex:1}
+  /* Stepper */
+  .stepper{display:flex;align-items:stretch;gap:0;border:1.5px solid var(--line);
+    border-radius:14px;overflow:hidden;background:#fff}
+  .step-btn{flex:none;width:64px;background:#f7f8f6;border:none;font-size:30px;font-weight:300;
+    color:var(--road);cursor:pointer;line-height:1}
+  .step-btn:active{background:#eef0ec}
+  .step-val{flex:1;border:none;text-align:center;font-family:var(--display);font-weight:800;
+    font-size:30px;color:var(--ink);min-height:64px;width:100%;padding:0}
+  .step-val:focus{outline:none}
+  /* Big number field (miles) */
+  .big-ig{position:relative}
+  .big-ig .big-num{min-height:60px;font-family:var(--display);font-weight:800;font-size:26px;
+    text-align:left;padding:0 56px 0 16px}
+  .big-ig .suffix{position:absolute;right:16px;top:50%;transform:translateY(-50%);
+    color:var(--muted);font-weight:700;font-size:16px}
+  .picked-date{margin:8px 2px 0;color:var(--amber-d);font-weight:700}
+  /* Live pay readout */
+  .pay-live{display:flex;align-items:baseline;justify-content:space-between;
+    background:linear-gradient(120deg,#eef2ff,#f6ffe0);border:1.5px solid #cdd7ff;border-radius:16px;
+    padding:14px 16px;margin:20px 0 16px;box-shadow:0 6px 18px rgba(42,75,255,.12)}
+  .pay-live .pl-lbl{font-size:13px;font-weight:700;color:var(--cobalt)}
+  .pay-live .pl-amt{font-family:var(--display);font-weight:800;font-size:27px;color:var(--cobalt-d)}
+  .pay-live .pl-break{font-size:11px;color:var(--muted);display:block;text-align:right;font-weight:500}
+  /* Form */
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:6px}
+  .field .hint{font-weight:500;color:var(--muted);font-size:11.5px}
+  .input{width:100%;min-height:var(--tap);border:1.5px solid var(--line);border-radius:12px;
+    padding:0 14px;font-size:16px;color:var(--ink);background:#fff}
+  .input:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(42,75,255,.16)}
+  textarea.input{padding:12px 14px;min-height:62px;resize:vertical}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ig{position:relative}
+  .ig .pre{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);
+    font-size:16px;pointer-events:none}
+  .ig .input{padding-left:30px}
+  /* Toll lines */
+  .toll-line{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;
+    background:#fafbf9;border:1.5px solid var(--line);border-radius:14px;padding:10px}
+  .toll-amt-row{display:flex;gap:8px;align-items:stretch}
+  .toll-amt{position:relative;flex:1;min-width:0}
+  .toll-amt .pre{position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    font-family:var(--display);font-weight:800;font-size:23px;color:var(--muted);pointer-events:none}
+  .toll-amt .tl-amt{width:100%;min-height:58px;font-family:var(--display);font-weight:800;
+    font-size:23px;padding:0 14px 0 36px}
+  .toll-line .tl-label{min-height:44px;font-size:15px}
+  .toll-line .x{flex:none;width:58px;min-height:58px;border:1.5px solid var(--line);
+    background:#fff;border-radius:11px;color:var(--danger);font-size:22px;cursor:pointer}
+  /* Period list / history */
+  .prow{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+  .prow:last-child{border-bottom:none}
+  .prow .pmain{flex:1;min-width:0}
+  .prow .pmain b{font-size:14.5px;display:block}
+  .prow .pmain span{font-size:12px;color:var(--muted)}
+  .prow .pamt{text-align:right}
+  .prow .pamt b{font-family:var(--display);font-size:16px}
+  .prow .pamt span{font-size:11px;display:block}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;
+    text-transform:uppercase;letter-spacing:.04em}
+  .tag.sent{background:var(--good-bg);color:var(--good)}
+  .tag.open{background:var(--warn-bg);color:var(--warn)}
+  /* Entry list */
+  .entry{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .entry:last-child{border-bottom:none}
+  .entry .d{flex:none;width:46px;text-align:center}
+  .entry .d b{font-family:var(--display);font-size:18px;display:block;line-height:1}
+  .entry .d span{font-size:10px;color:var(--muted);text-transform:uppercase}
+  .entry .info{flex:1;min-width:0;font-size:13px;color:var(--ink2)}
+  .entry .info .l1{font-weight:600;color:var(--ink)}
+  .entry .info .l2{color:var(--muted);font-size:12px}
+  .entry .ed{flex:none;align-self:center;color:var(--amber-d);font-size:12.5px;font-weight:700;
+    background:none;border:none;cursor:pointer;padding:8px}
+  /* Invoice preview */
+  .inv{font-size:13px;color:var(--ink2)}
+  .inv table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px}
+  .inv th{text-align:left;color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--line);padding:6px 4px;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+  .inv td{padding:7px 4px;border-bottom:1px solid var(--line)}
+  .inv td.r,.inv th.r{text-align:right}
+  .inv .tot{display:flex;justify-content:space-between;padding:6px 4px;font-size:14px}
+  .inv .tot.grand{border-top:2px solid var(--road);margin-top:6px;padding-top:10px;font-weight:800;font-size:18px;font-family:var(--display)}
+  /* Nav */
+  nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:#fff;
+    border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);
+    box-shadow:0 -2px 18px rgba(20,24,29,.06)}
+  nav .wrap{display:flex;padding:0}
+  nav button{flex:1;background:none;border:none;cursor:pointer;padding:9px 0 8px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);
+    font-family:var(--body);font-size:10.5px;font-weight:600}
+  nav button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9}
+  nav button.active{color:var(--cobalt)}
+  nav button.active svg{stroke:var(--cobalt)}
+  /* Misc */
+  .empty{text-align:center;padding:30px 16px;color:var(--muted);font-size:13.5px}
+  .empty .em{font-size:34px;display:block;margin-bottom:8px}
+  .banner{display:flex;gap:12px;align-items:flex-start;background:var(--warn-bg);
+    border:1.5px solid #f0d3ad;border-radius:14px;padding:14px;margin-bottom:16px}
+  .banner .em{font-size:22px}
+  .banner b{display:block;font-size:13.5px;color:var(--warn)}
+  .banner p{margin:2px 0 0;font-size:12.5px;color:var(--ink2)}
+  .hide{display:none!important}
+  .view{display:none}
+  .view.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);
+    background:var(--road);color:#fff;padding:12px 18px;border-radius:12px;font-size:13.5px;
+    font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;
+    transition:all .25s ease;z-index:90;max-width:90%}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .row-split{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .small{font-size:12px;color:var(--muted)}
+  .divider{height:1px;background:var(--line);margin:16px 0}
+  details summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--ink2);padding:8px 0}
+  details summary::-webkit-details-marker{color:var(--amber-d)}
+  @media print{
+    header,nav,.no-print{display:none!important}
+    body{background:#fff;padding:0}
+    .card{box-shadow:none;border:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="badge">MM</div>
+    <div>
+      <h1>MileMate</h1>
+      <div class="sub">Your miles, hours &amp; pay</div>
+    </div>
+    <div class="who" id="whoami"></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ HOME / DASHBOARD ============ -->
+  <section id="view-home" class="view active">
+    <div id="payReminder"></div>
+
+    <div class="card hero" id="heroCard">
+      <span class="eyebrow">Current pay period</span>
+      <div class="range" id="heroRange">—</div>
+      <div class="payday" id="heroPayday"></div>
+      <div class="due">
+        <div class="amt" id="heroAmt">$0.00</div>
+        <div class="lbl">earned<br>so far</div>
+      </div>
+      <div class="pills" id="heroPills"></div>
+    </div>
+
+    <button class="btn btn-primary big-cta" id="goLog">
+      <span class="cta-ico">＋</span>
+      <span class="cta-tx"><b id="ctaLabel">Log today’s work</b><span id="ctaSub">Hours, miles &amp; tolls — one screen</span></span>
+    </button>
+
+    <div class="card">
+      <div class="row-split" style="margin-bottom:10px">
+        <h2>This period</h2>
+        <button class="link-btn" id="goInvoiceCur">View invoice ›</button>
+      </div>
+      <div id="curEntries"></div>
+    </div>
+  </section>
+
+  <!-- ============ ENTRY FORM ============ -->
+  <section id="view-log" class="view">
+    <div class="card">
+      <div class="row-split" style="margin-bottom:6px">
+        <h2 id="logTitle">Log today’s work</h2>
+        <button class="link-btn" id="cancelEntry">Cancel</button>
+      </div>
+
+      <label class="lbl-sm first">Which day?</label>
+      <div class="chips" id="dateChips">
+        <button class="chip" data-day="0">Today</button>
+        <button class="chip" data-day="-1">Yesterday</button>
+        <button class="chip" id="chipPick">Another day</button>
+      </div>
+      <input type="date" class="input hide" id="fDate">
+      <div class="picked-date" id="pickedDate"></div>
+
+      <label class="lbl-sm">Hours worked</label>
+      <div class="stepper">
+        <button class="step-btn" data-d="-0.25" type="button">–</button>
+        <input class="step-val" id="fHours" inputmode="decimal" value="0">
+        <button class="step-btn" data-d="0.25" type="button">＋</button>
+      </div>
+      <div class="chips small-chips">
+        <button class="chip" data-seth="4">4 hrs</button>
+        <button class="chip" data-seth="6">6 hrs</button>
+        <button class="chip" data-seth="8">8 hrs</button>
+        <button class="chip" data-seth="10">10 hrs</button>
+      </div>
+
+      <label class="lbl-sm">Miles driven</label>
+      <div class="ig big-ig">
+        <input class="input big-num" id="fMiles" inputmode="decimal" placeholder="0">
+        <span class="suffix">mi</span>
+      </div>
+
+      <label class="lbl-sm">Tolls <span class="hint">— optional, at actual cost</span></label>
+      <div id="tollLines"></div>
+      <button class="btn btn-ghost btn-sm" id="addToll" style="margin-top:4px">＋ Add a toll</button>
+
+      <details style="margin-top:16px">
+        <summary>Add a note (optional)</summary>
+        <textarea class="input" id="fNotes" placeholder="Route, vehicle, anything to remember" style="margin-top:8px"></textarea>
+      </details>
+
+      <details style="margin-top:8px">
+        <summary>✎ Or just type your day in plain words</summary>
+        <div style="margin-top:8px">
+          <textarea class="nl-input" id="nlInput" placeholder="e.g. 8 hours, 120 miles, $4 toll"></textarea>
+          <div style="height:8px"></div>
+          <button class="btn btn-ghost btn-sm" id="nlGo" style="width:100%">Fill the form from this</button>
+          <div class="small" id="asstMsg" style="margin-top:8px"></div>
+        </div>
+      </details>
+
+      <div class="pay-live" id="liveCalc">
+        <span class="pl-lbl">This day pays</span>
+        <span><span class="pl-amt" id="plAmt">$0.00</span><span class="pl-break" id="plBreak"></span></span>
+      </div>
+
+      <button class="btn btn-primary" id="saveEntry">Save this day</button>
+      <div style="height:10px"></div>
+      <button class="btn btn-ghost no-print hide" id="deleteEntry" style="color:var(--danger);width:100%">Delete this day</button>
+    </div>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section id="view-history" class="view">
+    <div class="card">
+      <h2>Pay periods</h2>
+      <p class="lead">Every two-week cycle is stored here for your records.</p>
+      <div id="periodList"></div>
+    </div>
+  </section>
+
+  <!-- ============ INVOICE ============ -->
+  <section id="view-invoice" class="view">
+    <div class="card">
+      <div class="row-split no-print" style="margin-bottom:6px">
+        <h2>Invoice</h2>
+        <button class="btn btn-ghost btn-sm" id="invBack">‹ Back</button>
+      </div>
+      <div id="invoiceBody" class="inv"></div>
+    </div>
+    <div class="no-print">
+      <button class="btn btn-primary" id="emailInv">✉ Email this invoice</button>
+      <div style="height:10px"></div>
+      <div class="btn-row">
+        <button class="btn btn-dark" id="printInv">Save as PDF</button>
+        <button class="btn btn-ghost" id="copyInv">Copy text</button>
+      </div>
+      <div style="height:10px"></div>
+      <button class="btn btn-ghost btn-sm" id="markSent" style="width:100%">Mark this invoice as emailed</button>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="view-settings" class="view">
+    <div class="card">
+      <h2>Pay setup</h2>
+      <p class="lead">Rates are open to edit anytime pay changes.</p>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Mileage rate <span class="hint">$/mile</span></label>
+          <div class="ig"><span class="pre">$</span><input type="number" inputmode="decimal" step="0.001" class="input" id="sMileRate"></div>
+        </div>
+        <div class="field">
+          <label>Hourly rate <span class="hint">$/hour</span></label>
+          <div class="ig"><span class="pre">$</span><input type="number" inputmode="decimal" step="0.01" class="input" id="sHourRate"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>A recent pay day</label>
+        <input type="date" class="input" id="sPayday">
+        <span class="hint">Enter any one pay day. Every cycle is built from this, 14 days apart.</span>
+      </div>
+      <div class="field">
+        <label>Pay day falls how many days after the period ends?</label>
+        <input type="number" inputmode="numeric" step="1" min="0" max="31" class="input" id="sOffset">
+        <span class="hint">Example: period ends 5/23, paid 5/29 → 6 days.</span>
+      </div>
+      <div class="small" id="cycleHint" style="margin-top:-4px;margin-bottom:14px"></div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>Your name <span class="hint">— appears on the invoice</span></label>
+        <input type="text" class="input" id="sDriver" placeholder="e.g. Lisa Martinez">
+      </div>
+      <div class="field">
+        <label>Send invoices to <span class="hint">— manager's email</span></label>
+        <input type="email" class="input" id="sEmail" placeholder="bcurry@cfhcs.org" autocapitalize="off">
+      </div>
+      <div class="field">
+        <label>Manager name <span class="hint">— optional</span></label>
+        <input type="text" class="input" id="sManager" placeholder="optional">
+      </div>
+
+      <button class="btn btn-primary" id="saveSettings">Save setup</button>
+    </div>
+
+    <div class="card">
+      <h2>Your records</h2>
+      <p class="lead">Everything is stored on this phone for auditing. Export anytime.</p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="exportCsv">Export CSV</button>
+        <button class="btn btn-ghost" id="exportJson">Export JSON</button>
+      </div>
+      <div style="height:10px"></div>
+      <details>
+        <summary>Audit log (every change, time-stamped)</summary>
+        <div id="auditLog" class="small" style="margin-top:8px"></div>
+      </details>
+      <div class="divider"></div>
+      <div class="small" id="storeStat"></div>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <div class="wrap">
+    <button data-go="home" class="active">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 9.5V21h14V9.5"/></svg>Home</button>
+    <button data-go="log">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Log</button>
+    <button data-go="history">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h12"/></svg>Periods</button>
+    <button data-go="settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2l-.3-2.5H10l-.3 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.3 2.5h4l.3-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5A7 7 0 0 0 19 12z"/></svg>Setup</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   MileMate  —  offline PWA for delivery driver pay logging
+   Storage: IndexedDB (entries + append-only audit log)
+            localStorage (settings)
+   ============================================================ */
+const DAY = 86400000;
+const $ = id => document.getElementById(id);
+
+/* ---------- Settings ---------- */
+const SKEY = 'driverpay.settings.v1';
+const DEFAULTS = {
+  mileRate: 0.725,
+  hourRate: 25.00,
+  refPayday: '2026-05-29',   // any one known pay day
+  offsetDays: 6,             // pay day = period end + offsetDays
+  driver: '',
+  email: 'bcurry@cfhcs.org',
+  manager: ''
+};
+let S = load();
+function load(){
+  try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(SKEY)||'{}')); }
+  catch(e){ return Object.assign({}, DEFAULTS); }
+}
+function saveS(){ localStorage.setItem(SKEY, JSON.stringify(S)); }
+
+/* ---------- Date helpers (work in local date, no tz drift) ---------- */
+function parseYMD(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y, m-1, d); }
+function toYMD(dt){ return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+function addDays(dt,n){ return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+n); }
+function todayYMD(){ return toYMD(new Date()); }
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function pretty(s){ const d=parseYMD(s); return MON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+function prettyShort(s){ const d=parseYMD(s); return MON[d.getMonth()]+' '+d.getDate(); }
+function dow(s){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][parseYMD(s).getDay()]; }
+
+/* ---------- Pay-period engine ----------
+   anchorEnd = refPayday - offsetDays ; anchorStart = anchorEnd - 13
+   Any date d lands in period k = floor((d - anchorStart)/14)         */
+function anchorStart(){ const end = addDays(parseYMD(S.refPayday), -S.offsetDays); return addDays(end, -13); }
+function periodForDate(ymd){
+  const d = parseYMD(ymd), a = anchorStart();
+  const k = Math.floor((d - a)/(14*DAY));
+  const start = addDays(a, k*14);
+  const end = addDays(start, 13);
+  const payday = addDays(end, S.offsetDays);
+  return { key: toYMD(start), start: toYMD(start), end: toYMD(end), payday: toYMD(payday) };
+}
+function shiftPeriod(p, n){ return periodForDate(toYMD(addDays(parseYMD(p.start), n*14))); }
+function inPeriod(ymd, p){ return ymd >= p.start && ymd <= p.end; }
+let CURRENT = periodForDate(todayYMD());
+let viewingPeriod = CURRENT;
+
+/* ---------- Money ---------- */
+const money = n => '$'+(Math.round((n+Number.EPSILON)*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num = v => { const n = parseFloat(v); return isFinite(n)?n:0; };
+
+/* ============================================================
+   IndexedDB
+   ============================================================ */
+let DB;
+function openDB(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open('driverpay', 1);
+    r.onupgradeneeded = e=>{
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains('entries')){
+        const os = db.createObjectStore('entries',{keyPath:'id'});
+        os.createIndex('date','date',{unique:false});
+      }
+      if(!db.objectStoreNames.contains('audit')) db.createObjectStore('audit',{keyPath:'id',autoIncrement:true});
+      if(!db.objectStoreNames.contains('sent')) db.createObjectStore('sent',{keyPath:'key'});
+    };
+    r.onsuccess = e=>{ DB=e.target.result; res(); };
+    r.onerror = e=>rej(e);
+  });
+}
+function tx(store,mode){ return DB.transaction(store,mode).objectStore(store); }
+function getAll(store){ return new Promise(res=>{ const out=[]; tx(store,'readonly').openCursor().onsuccess=e=>{const c=e.target.result; if(c){out.push(c.value);c.continue();}else res(out);}; }); }
+function putRec(store,rec){ return new Promise(res=>{ tx(store,'readwrite').put(rec).onsuccess=()=>res(); }); }
+function delRec(store,key){ return new Promise(res=>{ tx(store,'readwrite').delete(key).onsuccess=()=>res(); }); }
+function getRec(store,key){ return new Promise(res=>{ tx(store,'readonly').get(key).onsuccess=e=>res(e.target.result); }); }
+
+async function audit(action, detail){
+  await putRec('audit', { ts:new Date().toISOString(), action, detail });
+}
+
+let ENTRIES = [];
+async function refresh(){
+  ENTRIES = (await getAll('entries')).sort((a,b)=> a.date<b.date?1:-1);
+}
+
+/* ---------- Entry totals ---------- */
+function entryTolls(e){ return (e.tolls||[]).reduce((s,t)=>s+num(t.amount),0); }
+function periodEntries(p){ return ENTRIES.filter(e=>inPeriod(e.date,p)).sort((a,b)=>a.date<b.date?-1:1); }
+function totalsFor(list){
+  let h=0,m=0,t=0;
+  list.forEach(e=>{ h+=num(e.hours); m+=num(e.miles); t+=entryTolls(e); });
+  const hourPay=h*num(S.hourRate), milePay=m*num(S.mileRate);
+  return { hours:h, miles:m, tolls:t, hourPay, milePay, total:hourPay+milePay+t };
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+function setWho(){
+  $('whoami').innerHTML = S.driver ? `<span>signed in</span><b>${esc(S.driver)}</b>` : `<span>tap Setup</span><b>Set you up →</b>`;
+}
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderHome(){
+  CURRENT = periodForDate(todayYMD());
+  const list = periodEntries(CURRENT);
+  const t = totalsFor(list);
+  $('heroRange').textContent = prettyShort(CURRENT.start)+' – '+pretty(CURRENT.end);
+  $('heroPayday').innerHTML = 'Pay day <b>'+pretty(CURRENT.payday)+'</b>';
+  $('heroAmt').textContent = money(t.total);
+  $('heroPills').innerHTML =
+    `<div class="pill"><b>${t.hours.toLocaleString()}</b> hrs</div>`+
+    `<div class="pill"><b>${t.miles.toLocaleString()}</b> mi</div>`+
+    `<div class="pill"><b>${money(t.tolls)}</b> tolls</div>`+
+    `<div class="pill"><b>${list.length}</b> days logged</div>`;
+
+  // Dynamic primary action: edit today if already logged, else add
+  const todays = ENTRIES.find(e=>e.date===todayYMD());
+  if(todays){
+    $('ctaLabel').textContent='Edit today’s work';
+    $('ctaSub').textContent=`Logged ${num(todays.hours)} hrs · ${num(todays.miles)} mi — tap to change`;
+  } else {
+    $('ctaLabel').textContent='Log today’s work';
+    $('ctaSub').textContent='Hours, miles & tolls — one screen';
+  }
+
+  $('curEntries').innerHTML = list.length ? list.slice().reverse().map(entryRow).join('') :
+    `<div class="empty"><span class="em">🚚</span>Nothing logged yet this period.<br>Tap “Log today’s work” to add a day.</div>`;
+  bindEntryEdits('curEntries');
+
+  // Pay-day reminder banner
+  renderReminder();
+  setWho();
+}
+
+function entryRow(e){
+  const t = entryTolls(e);
+  const bits = [num(e.hours)+' hrs', num(e.miles)+' mi'];
+  if(t>0) bits.push(money(t)+' tolls');
+  return `<div class="entry">
+    <div class="d"><b>${parseYMD(e.date).getDate()}</b><span>${dow(e.date)}</span></div>
+    <div class="info"><div class="l1">${bits.join(' · ')}</div>
+      ${e.notes?`<div class="l2">${esc(e.notes)}</div>`:''}</div>
+    <button class="ed" data-edit="${e.id}">Edit</button>
+  </div>`;
+}
+function bindEntryEdits(containerId){
+  $(containerId).querySelectorAll('[data-edit]').forEach(b=>{
+    b.onclick = ()=> openEntry(b.getAttribute('data-edit'));
+  });
+}
+
+async function renderReminder(){
+  const t = todayYMD();
+  // Find most recent period whose pay day is today or earlier and that has entries but is not marked sent
+  let p = CURRENT;
+  for(let i=0;i<6;i++){
+    const pp = shiftPeriod(CURRENT,-i);
+    if(pp.payday <= t){
+      const list = periodEntries(pp);
+      const sent = await getRec('sent', pp.key);
+      if(list.length && !sent){
+        $('payReminder').innerHTML =
+          `<div class="banner"><span class="em">⏰</span><div>
+             <b>Time to send your invoice</b>
+             <p>Pay period <b>${prettyShort(pp.start)}–${prettyShort(pp.end)}</b> is ready
+             (pay day ${pretty(pp.payday)}). Tap to review &amp; email it.</p>
+             <div style="height:10px"></div>
+             <button class="btn btn-primary btn-sm" id="remindGo">Review invoice</button>
+           </div></div>`;
+        $('remindGo').onclick = ()=>{ viewingPeriod=pp; renderInvoice(); show('invoice'); };
+        return;
+      }
+    }
+  }
+  $('payReminder').innerHTML='';
+}
+
+/* ---------- History ---------- */
+async function renderHistory(){
+  // Build the set of periods that have entries, plus current
+  const keys = new Set([CURRENT.key]);
+  ENTRIES.forEach(e=> keys.add(periodForDate(e.date).key));
+  const periods = [...keys].map(k=>periodForDate(k)).sort((a,b)=> a.start<b.start?1:-1);
+  const rows = [];
+  for(const p of periods){
+    const t = totalsFor(periodEntries(p));
+    const sent = await getRec('sent', p.key);
+    const isCur = p.key===CURRENT.key;
+    rows.push(`<div class="prow" data-pkey="${p.key}">
+      <div class="pmain">
+        <b>${prettyShort(p.start)} – ${pretty(p.end)}</b>
+        <span>Pay day ${pretty(p.payday)} ${isCur?'· current':''}</span>
+      </div>
+      <div class="pamt">
+        <b>${money(t.total)}</b>
+        <span>${sent?`<i class="tag sent">emailed</i>`:`<i class="tag open">open</i>`}</span>
+      </div>
+    </div>`);
+  }
+  $('periodList').innerHTML = rows.length?rows.join(''):`<div class="empty"><span class="em">📅</span>No periods yet.</div>`;
+  $('periodList').querySelectorAll('[data-pkey]').forEach(r=>{
+    r.onclick = ()=>{ viewingPeriod = periodForDate(r.getAttribute('data-pkey')); renderInvoice(); show('invoice'); };
+  });
+}
+
+/* ---------- Invoice ---------- */
+function invoiceText(p){
+  const list = periodEntries(p);
+  const t = totalsFor(list);
+  const L=[];
+  L.push('MILEMATE  ·  DRIVER INVOICE');
+  L.push('');
+  L.push('Driver: '+(S.driver||'(name not set)'));
+  L.push('Pay period: '+pretty(p.start)+' – '+pretty(p.end));
+  L.push('Pay day: '+pretty(p.payday));
+  L.push('Submitted: '+pretty(todayYMD()));
+  L.push('');
+  L.push('DAILY DETAIL');
+  list.forEach(e=>{
+    const to=entryTolls(e);
+    L.push('  '+dow(e.date)+' '+prettyShort(e.date)+
+      ' — '+num(e.hours)+' hrs, '+num(e.miles)+' mi'+(to>0?', '+money(to)+' tolls':'')+
+      (e.notes?'  ('+e.notes+')':''));
+  });
+  if(!list.length) L.push('  (no days logged)');
+  L.push('');
+  L.push('TOTALS');
+  L.push('  Hours: '+t.hours+' @ '+money(S.hourRate)+'/hr = '+money(t.hourPay));
+  L.push('  Miles: '+t.miles+' @ $'+num(S.mileRate).toFixed(3)+'/mi = '+money(t.milePay));
+  L.push('  Tolls (at cost): '+money(t.tolls));
+  L.push('  --------------------------------');
+  L.push('  AMOUNT DUE: '+money(t.total));
+  return L.join('\n');
+}
+function renderInvoice(){
+  const p = viewingPeriod;
+  const list = periodEntries(p);
+  const t = totalsFor(list);
+  $('invoiceBody').innerHTML =
+    `<div style="margin-bottom:12px">
+       <div style="font-family:var(--display);font-size:20px;font-weight:800">${esc(S.driver||'Driver')}</div>
+       <div class="small">Pay period <b>${prettyShort(p.start)} – ${pretty(p.end)}</b></div>
+       <div class="small">Pay day <b>${pretty(p.payday)}</b> · prepared ${pretty(todayYMD())}</div>
+     </div>
+     <table>
+       <thead><tr><th>Date</th><th class="r">Hrs</th><th class="r">Miles</th><th class="r">Tolls</th></tr></thead>
+       <tbody>
+       ${list.map(e=>`<tr><td>${dow(e.date)} ${prettyShort(e.date)}${e.notes?`<div class="small">${esc(e.notes)}</div>`:''}</td>
+          <td class="r">${num(e.hours)}</td><td class="r">${num(e.miles)}</td><td class="r">${entryTolls(e)?money(entryTolls(e)):'—'}</td></tr>`).join('')||
+          '<tr><td colspan="4" class="small">No days logged in this period.</td></tr>'}
+       </tbody>
+     </table>
+     <div class="tot"><span>Hours — ${t.hours} @ ${money(S.hourRate)}/hr</span><b>${money(t.hourPay)}</b></div>
+     <div class="tot"><span>Miles — ${t.miles} @ $${num(S.mileRate).toFixed(3)}/mi</span><b>${money(t.milePay)}</b></div>
+     <div class="tot"><span>Tolls — at cost</span><b>${money(t.tolls)}</b></div>
+     <div class="tot grand"><span>Amount due</span><span>${money(t.total)}</span></div>`;
+}
+
+/* ---------- Entry form ---------- */
+let editingId = null;
+function blankTollLine(label='',amount=''){
+  return `<div class="toll-line">
+    <div class="toll-amt-row">
+      <div class="toll-amt"><span class="pre">$</span>
+        <input class="input tl-amt" inputmode="decimal" step="0.01" placeholder="0.00" value="${esc(amount)}"></div>
+      <button class="x" title="remove">×</button>
+    </div>
+    <input class="input tl-label" placeholder="Where? (optional — e.g. SR-417)" value="${esc(label)}">
+  </div>`;
+}
+function addTollLine(label,amount){
+  const d=document.createElement('div'); d.innerHTML=blankTollLine(label,amount);
+  const node=d.firstElementChild;
+  node.querySelector('.x').onclick=()=>{ node.remove(); liveCalc(); };
+  node.querySelectorAll('input').forEach(i=>i.addEventListener('input',liveCalc));
+  $('tollLines').appendChild(node);
+}
+function readTolls(){
+  const out=[];
+  $('tollLines').querySelectorAll('.toll-line').forEach(l=>{
+    const amt=num(l.querySelector('.tl-amt').value);
+    const lbl=l.querySelector('.tl-label').value.trim();
+    if(amt>0||lbl) out.push({label:lbl,amount:amt});
+  });
+  return out;
+}
+function liveCalc(){
+  const h=num($('fHours').value), m=num($('fMiles').value);
+  const to=readTolls().reduce((s,t)=>s+num(t.amount),0);
+  const tot=h*num(S.hourRate)+m*num(S.mileRate)+to;
+  $('plAmt').textContent = money(tot);
+  $('plBreak').textContent = `${money(h*num(S.hourRate))} time · ${money(m*num(S.mileRate))} miles${to>0?' · '+money(to)+' tolls':''}`;
+}
+
+/* ---- Date selector (Today / Yesterday / pick) ---- */
+function setDate(ymd){
+  $('fDate').value = ymd;
+  const t = todayYMD(), y = toYMD(addDays(parseYMD(t),-1));
+  let active = 'chipPick';
+  if(ymd===t) active='today'; else if(ymd===y) active='yest';
+  $('dateChips').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  if(active==='today') $('dateChips').querySelector('[data-day="0"]').classList.add('active');
+  else if(active==='yest') $('dateChips').querySelector('[data-day="-1"]').classList.add('active');
+  else $('chipPick').classList.add('active');
+  $('pickedDate').textContent = (active==='chipPick') ? '📅 '+pretty(ymd) : '';
+}
+function setHours(v){ v=Math.max(0, Math.round(v*4)/4); $('fHours').value=(v%1===0)? v : v.toFixed(2).replace(/0$/,''); liveCalc(); }
+
+function openEntry(id){
+  editingId = id||null;
+  $('logTitle').textContent = id?'Edit this day':'Log today’s work';
+  $('deleteEntry').classList.toggle('hide', !id);
+  $('tollLines').innerHTML='';
+  $('nlInput').value=''; $('asstMsg').textContent='';
+  if(id){
+    const e = ENTRIES.find(x=>x.id===id);
+    setDate(e.date); $('fHours').value=e.hours||0; $('fMiles').value=e.miles||''; $('fNotes').value=e.notes||'';
+    (e.tolls||[]).forEach(t=>addTollLine(t.label,t.amount));
+  } else {
+    setDate(todayYMD()); $('fHours').value=0; $('fMiles').value=''; $('fNotes').value='';
+  }
+  liveCalc();
+  show('log');
+}
+function smartLog(){
+  const todays = ENTRIES.find(e=>e.date===todayYMD());
+  openEntry(todays ? todays.id : null);
+}
+async function saveEntry(){
+  const date=$('fDate').value;
+  if(!date){ toast('Please pick a date'); return; }
+  const rec = {
+    id: editingId || ('e_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)),
+    date,
+    hours: num($('fHours').value),
+    miles: num($('fMiles').value),
+    tolls: readTolls(),
+    notes: $('fNotes').value.trim(),
+    updatedAt: new Date().toISOString()
+  };
+  if(!editingId) rec.createdAt = rec.updatedAt;
+  else { const old=ENTRIES.find(x=>x.id===editingId); rec.createdAt = old?old.createdAt:rec.updatedAt; }
+  await putRec('entries', rec);
+  await audit(editingId?'edit-entry':'add-entry',
+    `${date}: ${rec.hours}h, ${rec.miles}mi, ${money(entryTolls(rec))} tolls`);
+  await refresh();
+  toast(editingId?'Day updated':'Day saved ✓');
+  editingId=null;
+  renderHome(); show('home');
+}
+async function deleteEntry(){
+  if(!editingId) return;
+  if(!confirm('Delete this day? This is recorded in the audit log.')) return;
+  const e=ENTRIES.find(x=>x.id===editingId);
+  await delRec('entries', editingId);
+  await audit('delete-entry', `${e.date}: ${e.hours}h, ${e.miles}mi`);
+  await refresh(); editingId=null;
+  toast('Day deleted'); renderHome(); show('home');
+}
+
+/* ---------- AI-like natural language parser ---------- */
+function parseNL(text){
+  const s = ' '+text.toLowerCase().replace(/,/g,' ')+' ';
+  const res = {};
+  // tolls: collect every $ amount, but if "toll" word present prefer those near it
+  let tollTotal=0; let tollMatches=[];
+  const dollarRe=/\$\s*([0-9]+(?:\.[0-9]{1,2})?)/g; let dm;
+  while((dm=dollarRe.exec(s))) tollMatches.push(parseFloat(dm[1]));
+  // also "X in tolls" / "X dollars toll"
+  const tollWordRe=/([0-9]+(?:\.[0-9]{1,2})?)\s*(?:dollars?|bucks?)?\s*(?:in\s+)?tolls?/g; let tw;
+  while((tw=tollWordRe.exec(s))) tollMatches.push(parseFloat(tw[1]));
+  if(tollMatches.length) tollTotal = [...new Set(tollMatches)].reduce((a,b)=>a+b,0);
+  if(tollTotal>0) res.tolls=tollTotal;
+  // hours
+  const hr = s.match(/([0-9]+(?:\.[0-9]+)?)\s*(?:hrs?|hours?|h\b)/);
+  if(hr) res.hours=parseFloat(hr[1]);
+  // miles
+  const mi = s.match(/([0-9]+(?:\.[0-9]+)?)\s*(?:miles?|mi\b)/);
+  if(mi) res.miles=parseFloat(mi[1]);
+  return res;
+}
+function runNL(){
+  const txt = $('nlInput').value.trim();
+  if(!txt){ $('asstMsg').textContent='Type your day first — like “8 hours, 130 miles, $5 toll”.'; return; }
+  const p = parseNL(txt);
+  const found=[];
+  if(p.hours!=null){ $('fHours').value=p.hours; found.push(`${p.hours} hours`); }
+  if(p.miles!=null){ $('fMiles').value=p.miles; found.push(`${p.miles} miles`); }
+  if(p.tolls!=null){ $('tollLines').innerHTML=''; addTollLine('',p.tolls); found.push(`${money(p.tolls)} tolls`); }
+  if(!found.length){
+    $('asstMsg').textContent = "Couldn't find numbers — try “worked 8 hours, drove 130 miles, $5 toll”.";
+    return;
+  }
+  liveCalc();
+  $('asstMsg').innerHTML = `Filled in: <b>${found.join(', ')}</b>. Check it above, then Save.`;
+  $('nlInput').value='';
+}
+
+/* ---------- Settings UI ---------- */
+function fillSettings(){
+  $('sMileRate').value=S.mileRate; $('sHourRate').value=S.hourRate;
+  $('sPayday').value=S.refPayday; $('sOffset').value=S.offsetDays;
+  $('sDriver').value=S.driver; $('sEmail').value=S.email; $('sManager').value=S.manager;
+  updateCycleHint();
+}
+function updateCycleHint(){
+  const ref=$('sPayday').value, off=parseInt($('sOffset').value);
+  if(ref && isFinite(off)){
+    const save={...S, refPayday:ref, offsetDays:off};
+    const old=S; S=save; const p=periodForDate(todayYMD()); S=old;
+    $('cycleHint').innerHTML = `Current cycle works out to <b>${prettyShort(p.start)} – ${pretty(p.end)}</b>, paid <b>${pretty(p.payday)}</b>.`;
+  }
+}
+function saveSettings(){
+  S.mileRate=num($('sMileRate').value)||DEFAULTS.mileRate;
+  S.hourRate=num($('sHourRate').value);
+  S.refPayday=$('sPayday').value||DEFAULTS.refPayday;
+  S.offsetDays=parseInt($('sOffset').value); if(!isFinite(S.offsetDays)) S.offsetDays=DEFAULTS.offsetDays;
+  S.driver=$('sDriver').value.trim();
+  S.email=$('sEmail').value.trim();
+  S.manager=$('sManager').value.trim();
+  saveS(); audit('settings', `rate $${S.mileRate}/mi, $${S.hourRate}/hr, payday ${S.refPayday}, offset ${S.offsetDays}`);
+  CURRENT=periodForDate(todayYMD());
+  toast('Setup saved ✓'); setWho(); renderHome(); show('home');
+}
+
+/* ---------- Audit + storage stats ---------- */
+async function renderAudit(){
+  const a = (await getAll('audit')).sort((x,y)=> x.ts<y.ts?1:-1).slice(0,80);
+  $('auditLog').innerHTML = a.length? a.map(r=>{
+    const d=new Date(r.ts);
+    return `<div style="padding:4px 0;border-bottom:1px solid var(--line)">
+      <b>${d.toLocaleString()}</b> — ${esc(r.action)}<br><span style="color:var(--muted)">${esc(r.detail||'')}</span></div>`;
+  }).join('') : '<div class="small">No activity yet.</div>';
+  $('storeStat').textContent = `${ENTRIES.length} day-records stored · ${a.length} recent audit events · data lives only on this device.`;
+}
+
+/* ---------- Export ---------- */
+function download(name, text, type){
+  const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function exportCsv(){
+  const rows=[['date','day','period_start','period_end','pay_day','hours','miles','toll_total','toll_detail','notes','created','updated']];
+  ENTRIES.slice().sort((a,b)=>a.date<b.date?-1:1).forEach(e=>{
+    const p=periodForDate(e.date);
+    const detail=(e.tolls||[]).map(t=>`${t.label||'toll'}:${t.amount}`).join('; ');
+    rows.push([e.date,dow(e.date),p.start,p.end,p.payday,e.hours,e.miles,entryTolls(e),detail,(e.notes||'').replace(/\n/g,' '),e.createdAt||'',e.updatedAt||'']);
+  });
+  const csv=rows.map(r=>r.map(c=>{const s=String(c==null?'':c); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\n');
+  download('milemate-export-'+todayYMD()+'.csv', csv, 'text/csv');
+  toast('CSV exported');
+}
+async function exportJson(){
+  const data={ exported:new Date().toISOString(), settings:S, entries:ENTRIES, audit:await getAll('audit'), sent:await getAll('sent') };
+  download('milemate-backup-'+todayYMD()+'.json', JSON.stringify(data,null,2), 'application/json');
+  toast('JSON backup exported');
+}
+
+/* ---------- Invoice actions ---------- */
+function emailInvoice(){
+  const p=viewingPeriod;
+  if(!S.email){ toast('Add manager email in Setup first'); show('settings'); return; }
+  const subj=`MileMate invoice — ${S.driver||'Driver'} — ${prettyShort(p.start)}–${prettyShort(p.end)} (pay day ${pretty(p.payday)})`;
+  const body=invoiceText(p);
+  window.location.href=`mailto:${encodeURIComponent(S.email)}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+}
+async function markSent(){
+  await putRec('sent',{key:viewingPeriod.key, ts:new Date().toISOString()});
+  await audit('invoice-sent', `${viewingPeriod.start}–${viewingPeriod.end}`);
+  toast('Marked as emailed ✓'); renderReminder();
+}
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+function show(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $('view-'+name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.go===name || (name==='invoice'&&b.dataset.go==='history')));
+  window.scrollTo(0,0);
+  if(name==='history') renderHistory();
+  if(name==='settings'){ fillSettings(); renderAudit(); }
+}
+
+/* ============================================================
+   Wire up
+   ============================================================ */
+function bind(){
+  document.querySelectorAll('nav button').forEach(b=> b.onclick=()=>{ if(b.dataset.go==='log') smartLog(); else show(b.dataset.go); });
+  $('goLog').onclick=smartLog;
+  $('goInvoiceCur').onclick=()=>{ viewingPeriod=periodForDate(todayYMD()); renderInvoice(); show('invoice'); };
+  $('nlGo').onclick=runNL;
+  $('nlInput').addEventListener('keydown',e=>{ if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)) runNL(); });
+  $('addToll').onclick=()=>addTollLine();
+  ['fHours','fMiles'].forEach(id=>$(id).addEventListener('input',liveCalc));
+  // Date chips
+  $('dateChips').querySelector('[data-day="0"]').onclick=()=>setDate(todayYMD());
+  $('dateChips').querySelector('[data-day="-1"]').onclick=()=>setDate(toYMD(addDays(new Date(),-1)));
+  $('chipPick').onclick=()=>{ const i=$('fDate'); i.classList.remove('hide'); (i.showPicker?i.showPicker():i.focus()); };
+  $('fDate').addEventListener('change',()=>{ if($('fDate').value){ setDate($('fDate').value); $('fDate').classList.add('hide'); }});
+  // Hours stepper + presets
+  document.querySelectorAll('.step-btn').forEach(b=> b.onclick=()=> setHours(num($('fHours').value)+parseFloat(b.dataset.d)) );
+  document.querySelectorAll('[data-seth]').forEach(b=> b.onclick=()=> setHours(parseFloat(b.dataset.seth)) );
+  $('saveEntry').onclick=saveEntry;
+  $('cancelEntry').onclick=()=>{ editingId=null; renderHome(); show('home'); };
+  $('deleteEntry').onclick=deleteEntry;
+  $('invBack').onclick=()=>show('history');
+  $('emailInv').onclick=emailInvoice;
+  $('printInv').onclick=()=>window.print();
+  $('copyInv').onclick=()=>{ navigator.clipboard.writeText(invoiceText(viewingPeriod)).then(()=>toast('Invoice copied')); };
+  $('markSent').onclick=markSent;
+  $('saveSettings').onclick=saveSettings;
+  $('sPayday').addEventListener('input',updateCycleHint);
+  $('sOffset').addEventListener('input',updateCycleHint);
+  $('exportCsv').onclick=exportCsv;
+  $('exportJson').onclick=exportJson;
+}
+let toastT;
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2200); }
+
+(async function init(){
+  bind();
+  try{ await openDB(); await refresh(); }catch(e){ toast('Storage unavailable'); }
+  renderHome();
+  if(!S.driver || !S.email){ /* gentle nudge handled by header */ }
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('service-worker.js').catch(()=>{}); }
+})();
+</script>
+</body>
+</html>
